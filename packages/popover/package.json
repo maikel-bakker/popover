@@ -1,0 +1,26 @@
+{
+  "name": "@popover/vanilla",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c",
+    "symlink-demo-dist": "rm -rf ./demo/dist && ln -s ../dist ./demo/dist",
+    "dev": "concurrently \"rollup -c --watch\" \"live-server ./demo --watch=./demo/index.html, ./demo/*.js --verbose\" \"npm run symlink-demo-dist\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "concurrently": "^9.2.1",
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2",
+    "rollup": "^4.53.5",
+    "rollup-plugin-typescript": "^1.0.1",
+    "typescript": "^5.9.3"
+  }
+}
