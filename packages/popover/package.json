@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c",
     "symlink-demo-dist": "rm -rf ./demo/dist && ln -s ../dist ./demo/dist",
-    "dev": "concurrently \"rollup -c --watch\" \"live-server ./demo --watch=./demo/index.html, ./demo/*.js --verbose\" \"npm run symlink-demo-dist\""
+    "dev": "npm run build && npm run symlink-demo-dist && concurrently \"rollup -c --watch\" \"live-server ./demo --watch=./demo/index.html, ./demo/*.js --verbose\"",
+    "test": "vitest --run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
     "live-server": "^1.2.2",
     "rollup": "^4.53.5",
     "rollup-plugin-typescript": "^1.0.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
   }
 }

@@ -7,13 +7,126 @@ export const placementOptions = [
   "top-center",
 ] as const;
 
-type PlacementOptions = (typeof placementOptions)[number];
+export type PlacementOptions = (typeof placementOptions)[number];
 
 type CalcPositionProps = {
   targetRect: DOMRect;
   popoverRect: DOMRect;
   placement: PlacementOptions;
 };
+
+type DeterminePositionProps = {
+  targetEl: HTMLElement;
+  popoverEl: HTMLElement;
+  containerDimensions: Pick<Dimensions, "width" | "height">;
+  preferredPlacement: PlacementOptions;
+};
+
+export function determinePosition({
+  targetEl,
+  popoverEl,
+  containerDimensions,
+  preferredPlacement,
+}: DeterminePositionProps) {
+  const targetRect = targetEl.getBoundingClientRect();
+  const popoverRect = popoverEl.getBoundingClientRect();
+
+  let placement = preferredPlacement;
+  let position: Pick<Dimensions, "top" | "left"> = {
+    top: 0,
+    left: 0,
+  };
+
+  const { top, left } = calcPosition({
+    targetRect,
+    popoverRect,
+    placement,
+  });
+
+  position = { top, left };
+
+  const { isOffScreen, offScreenSides } = checkIfOffScreen(
+    {
+      top: position.top,
+      left: position.left,
+      width: popoverRect.width,
+      height: popoverRect.height,
+    },
+    containerDimensions,
+  );
+
+  if (isOffScreen) {
+    let newPlacement = placement.split("-");
+    if (offScreenSides.top) {
+      newPlacement[0] = "bottom";
+    }
+
+    if (offScreenSides.bottom) {
+      newPlacement[0] = "top";
+    }
+
+    if (offScreenSides.left) {
+      newPlacement[1] = "center";
+      placement = newPlacement.join("-") as PlacementOptions;
+
+      const { top, left } = calcPosition({
+        targetRect,
+        popoverRect,
+        placement,
+      });
+
+      const { offScreenSides } = checkIfOffScreen(
+        {
+          top,
+          left,
+          width: popoverRect.width,
+          height: popoverRect.height,
+        },
+        containerDimensions,
+      );
+
+      if (offScreenSides.left) {
+        newPlacement[1] = "left";
+      }
+    }
+
+    if (offScreenSides.right) {
+      newPlacement[1] = "center";
+      placement = newPlacement.join("-") as PlacementOptions;
+
+      const { top, left } = calcPosition({
+        targetRect,
+        popoverRect,
+        placement,
+      });
+
+      const { offScreenSides } = checkIfOffScreen(
+        {
+          top,
+          left,
+          width: popoverRect.width,
+          height: popoverRect.height,
+        },
+        containerDimensions,
+      );
+
+      if (offScreenSides.right) {
+        newPlacement[1] = "right";
+      }
+    }
+    placement = newPlacement.join("-") as PlacementOptions;
+
+    const { top, left } = calcPosition({
+      targetRect,
+      popoverRect,
+      placement,
+    });
+
+    position = { top, left };
+  }
+
+  return { position, placement };
+}
 
 export function calcPosition({
   targetRect,
@@ -61,12 +174,19 @@ type Dimensions = {
   height: number;
 };
 
-export function checkIfOffScreen(dimensions: Dimensions) {
+export function checkIfOffScreen(
+  targetDimensions: Dimensions,
+  containerDimensions: Pick<Dimensions, "width" | "height">,
+) {
   const offScreenSides = {
-    top: dimensions.top < 0,
-    left: dimensions.left < 0,
-    bottom: dimensions.top + dimensions.height > window.innerHeight,
-    right: dimensions.left + dimensions.width > window.innerWidth,
+    top: targetDimensions.top < 0,
+    left: targetDimensions.left < 0,
+    bottom:
+      targetDimensions.top + targetDimensions.height >
+      containerDimensions.height,
+    right:
+      targetDimensions.left + targetDimensions.width >
+      containerDimensions.width,
   };
 
   return {

@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ESNext", // Emit ES5 compatible code
-    "module": "commonjs", // Compile to CommonJS module format
-    "declaration": true, // Generate .d.ts declaration files
-    "outDir": "dist", // Output directory for compiled files
-    "strict": true, // Enable all strict type-checking options
+    "target": "ESNext",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "dist",
+    "strict": true,
   },
-  "include": ["src"], // Include all TypeScript files in the src directory
+  "include": ["src"],
+  "exclude": ["dist", "demo", "**/*.test.ts", "**/*.test.js"],
 }

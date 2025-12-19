@@ -35,7 +35,7 @@
     @scope (#mypopover) {
       :scope {
         width: 200px;
-        height: 100px;
+        height: 300px;
         position: absolute;
         inset: unset;
         margin: 0;
@@ -91,6 +91,7 @@
       calcPosition,
       placementOptions,
       checkIfOffScreen,
+      determinePosition,
     } from "./dist/bundle.esm.js";
 
     const popover = document.getElementById("mypopover");
@@ -118,19 +119,36 @@
     });
 
     popover.addEventListener("toggle", (e) => {
-      console.log(e.newState);
-      const targetRect = target.getBoundingClientRect();
-      const popoverRect = e.target.getBoundingClientRect();
-
-      const { top, left } = calcPosition({
-        targetRect,
-        popoverRect,
-        placement: tooltipPlacementSelect.value,
+      const { position } = determinePosition({
+        targetEl: target,
+        popoverEl: e.target,
+        containerDimensions: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
+        preferredPlacement: tooltipPlacementSelect.value,
       });
 
-      e.target.style.top = `${top}px`;
-      e.target.style.left = `${left}px`;
+      e.target.style.top = `${position.top}px`;
+      e.target.style.left = `${position.left}px`;
       e.target.style.visibility = e.newState === "open" ? "visible" : "hidden";
+    });
+
+    window.addEventListener("resize", () => {
+      if (popover.matches(":popover-open")) {
+        const { position, placement } = determinePosition({
+          targetEl: target,
+          popoverEl: popover,
+          containerDimensions: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          },
+          preferredPlacement: tooltipPlacementSelect.value,
+        });
+
+        popover.style.top = `${position.top}px`;
+        popover.style.left = `${position.left}px`;
+      }
     });
   </script>
   <script type="module" src="dist/bundle.esm.js"></script>
