@@ -2,18 +2,28 @@
   "name": "@popover/vanilla",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "commonjs",
+  "main": "./dist/bundle.cjs.js",
+  "module": "./dist/bundle.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/bundle.cjs.js",
+      "import": "./dist/bundle.esm.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "npm run build:types && rollup -c",
+    "build:types": "tsc -p tsconfig.json --emitDeclarationOnly --declaration --declarationMap --outDir dist",
     "symlink-demo-dist": "rm -rf ./demo/dist && ln -s ../dist ./demo/dist",
     "dev": "npm run build && npm run symlink-demo-dist && concurrently \"rollup -c --watch\" \"live-server ./demo --watch=./demo/index.html, ./demo/*.js --verbose\"",
     "test": "vitest --run",
     "test:watch": "vitest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",

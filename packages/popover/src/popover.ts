@@ -15,7 +15,7 @@ type CalcPositionProps = {
   placement: PlacementOptions;
 };
 
-type DeterminePositionProps = {
+export type DeterminePositionProps = {
   targetEl: HTMLElement;
   popoverEl: HTMLElement;
   containerDimensions: Pick<Dimensions, "width" | "height">;
@@ -65,7 +65,8 @@ export function determinePosition({
       newPlacement[0] = "top";
     }
 
-    if (offScreenSides.left) {
+    if (offScreenSides.left || offScreenSides.right) {
+      const side = offScreenSides.left ? "left" : "right";
       newPlacement[1] = "center";
       placement = newPlacement.join("-") as PlacementOptions;
 
@@ -75,7 +76,7 @@ export function determinePosition({
         placement,
       });
 
-      const { offScreenSides } = checkIfOffScreen(
+      const { offScreenSides: newOffScreenSides } = checkIfOffScreen(
         {
           top,
           left,
@@ -85,35 +86,11 @@ export function determinePosition({
         containerDimensions,
       );
 
-      if (offScreenSides.left) {
-        newPlacement[1] = "left";
+      if (newOffScreenSides[side]) {
+        newPlacement[1] = side;
       }
     }
 
-    if (offScreenSides.right) {
-      newPlacement[1] = "center";
-      placement = newPlacement.join("-") as PlacementOptions;
-
-      const { top, left } = calcPosition({
-        targetRect,
-        popoverRect,
-        placement,
-      });
-
-      const { offScreenSides } = checkIfOffScreen(
-        {
-          top,
-          left,
-          width: popoverRect.width,
-          height: popoverRect.height,
-        },
-        containerDimensions,
-      );
-
-      if (offScreenSides.right) {
-        newPlacement[1] = "right";
-      }
-    }
     placement = newPlacement.join("-") as PlacementOptions;
 
     const { top, left } = calcPosition({
