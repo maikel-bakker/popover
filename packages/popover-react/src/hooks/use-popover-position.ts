@@ -10,15 +10,13 @@ export type UsePopoverPositionOptions = {
    * Falls back to `"bottom-left"`.
    */
   preferredPlacement?: DeterminePositionProps["preferredPlacement"];
-
-  /**
-   * Dimensions of the container to keep the popover within.
-   * Defaults to the current viewport (`window.innerWidth/innerHeight`).
-   *
-   * Override this if your popover is positioned within a specific scrolling
-   * container rather than the viewport.
+  /** Dimensions of the container within which to position the popover.
+   * Defaults to the viewport size.
    */
-  getContainerDimensions?: () => { width: number; height: number };
+  containerDimensions?: {
+    width: number;
+    height: number;
+  };
 };
 
 export type UsePopoverPositionResult = (
@@ -33,28 +31,22 @@ export type UsePopoverPositionResult = (
  * Designed for cases where you want to reposition as the target moves (e.g. dragging),
  * without coupling the hook to a specific popover "open/close" mechanism.
  */
-export function usePopoverPosition(
-  options: UsePopoverPositionOptions = {},
-): UsePopoverPositionResult {
-  const {
-    preferredPlacement = "bottom-left",
-    getContainerDimensions = () => ({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    }),
-  } = options;
-
+export function usePopoverPosition({
+  preferredPlacement = "bottom-left" as DeterminePositionProps["preferredPlacement"],
+  containerDimensions,
+}: UsePopoverPositionOptions): UsePopoverPositionResult {
   return useCallback(
     (targetEl: HTMLElement, popoverEl: HTMLElement) => {
-      const containerDimensions = getContainerDimensions();
-
       return determinePosition({
         targetEl,
         popoverEl,
-        containerDimensions,
+        containerDimensions: containerDimensions ?? {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
         preferredPlacement,
       });
     },
-    [getContainerDimensions, preferredPlacement],
+    [preferredPlacement, containerDimensions],
   );
 }

@@ -5,6 +5,7 @@ import { usePopoverPosition } from "../hooks/use-popover-position";
 import { placementOptions, type PlacementOptions } from "@popover/vanilla";
 import { useDraggable } from "../hooks/use-draggable";
 import { useRef, useState, useCallback } from "react";
+import { useRepositionOnResize } from "../hooks/use-reposition-on-resize";
 
 type NativePopoverArgs = {
   placement: PlacementOptions;
